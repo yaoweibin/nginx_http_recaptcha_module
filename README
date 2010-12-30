@@ -1,0 +1,89 @@
+Name
+    nginx_http_recaptcha_module - support google's reCAPTCHA with Nginx
+
+Status
+    This module is at its very early phase of development and considered
+    highly experimental. But you're encouraged to test it out on your side
+    and report any quirks that you experience.
+
+    We need your help! If you find this module useful and/or interesting,
+    please consider joining the development!
+
+examples
+Description
+    Add the support of reCAPTCHA with Nginx.
+
+Directives
+  recaptcha_page
+    syntax:*recaptcha_page on*
+
+    default: *none*
+
+    context: *http, server, location*
+
+    description:
+
+Variables
+Installation
+    Download the latest version of the release tarball of this module from
+    github (<https://github.com/yaoweibin/nginx_http_recaptcha_module>).
+
+    Grab the nginx source code from nginx.org (<http://nginx.org/>), for
+    example, the version 0.8.54 (see nginx compatibility), and then build
+    the source with this module:
+
+        $ wget 'http://nginx.org/download/nginx-0.8.54.tar.gz'
+        $ tar -xzvf nginx-0.8.54.tar.gz
+        $ cd nginx-0.8.54/
+
+        $ ./configure --add-module=/path/to/nginx_http_recaptcha_module 
+
+        $ make
+        $ make install
+
+Compatibility
+    *   My test bed is 0.8.54.
+
+TODO
+Known Issues
+    *   Developing
+
+Changelogs
+  v0.1
+    *   first release
+
+Authors
+    Weibin Yao(姚伟斌) *yaoweibin at gmail dot com*
+
+Copyright & License
+    This README template copy from agentzh (<http://github.com/agentzh>).
+
+    This module is licensed under the BSD license.
+
+    Copyright (C) 2010 by Weibin Yao <yaoweibin@gmail.com>.
+
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+    *   Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.
+
+    *   Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+    IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+    PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+    HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+    TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
