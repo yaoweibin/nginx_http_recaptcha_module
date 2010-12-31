@@ -152,6 +152,11 @@ ngx_http_add_form_variable(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
     *str = value[1];
 
+    if (str->data[0] == '$') {
+        str->data++;
+        str->len--;
+    }
+
     var = ngx_http_add_variable(cf, str, 0);
     if (var == NULL) {
         return NGX_CONF_ERROR;
