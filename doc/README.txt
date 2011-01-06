@@ -1,0 +1,207 @@
+Name
+    nginx_http_recaptcha_module - support google's reCAPTCHA with Nginx
+
+Description
+    There are some steps for this module:
+
+    *   First, the request comes from client. If the request contains the
+        correct secure cookie, it will do the normal action. If not, the
+        request will redirect to the recaptcha page.
+
+    *   Second, the client inputs the captcha letters.
+
+    *   Third, Nginx sends this input letters to recaptcha server for
+        verification.
+
+    *   Forth, the correct answer from reccaptcha server with beginning of
+        "true...", else it's beginning with "false...".
+
+    *   Fifth, add the secure cookie for the correct verified client,
+        redirect the client to the page which he wants to view.
+
+HOW TO
+    *   Install this module.
+
+    *   Get a pair of recaptcha key from google
+        (<https://www.google.com/recaptcha/admin/create>)
+
+    *   Copy the template recaptcha page from recaptcha_html/index.html to
+        your web directory.
+
+    *   Replace the public key in the recaptcha page.
+
+    *   Replace the private key in the config file.
+
+Examples
+        location / {
+            secure_cookie $cookie_CAPTCHA_SESSION,$cookie_CAPTCHA_EXPIRES;
+            secure_cookie_md5 private_key$binary_remote_addr$cookie_CAPTCHA_EXPIRES;
+
+            if ($cookie_CAPTCHA_SESSION = "") {
+                rewrite ^.*$ /captcha last;
+            }
+
+            if ($cookie_CAPTCHA_EXPIRES = "") {
+                rewrite ^.*$ /captcha last;
+            }
+
+            if ($secure_cookie = "0") {
+                rewrite ^.*$ /captcha last;
+            }
+
+            if ($secure_cookie = "") {
+                return 403;
+            }
+
+            proxy_pass http://your_backend;
+        }
+
+        location /captcha {
+            alias   captcha_html;
+            index  index.html index.htm;
+        }
+
+        location /verify {
+            eval_inherit_body on;
+            eval_override_content_type 'text/plain';
+
+            eval $verify_content {
+                recaptcha_challenge_name $recaptcha_challenge_field;
+                recaptcha_response_name $recaptcha_response_field;
+
+                proxy_method POST;
+                proxy_set_header  Accept-Encoding  "";
+                proxy_set_body "privatekey=your_privatekey_from_google&remoteip=$remote_addr&challenge=$recaptcha_challenge_field&response=$recaptcha_response_field";
+
+                rewrite .* /recaptcha/api/verify break;
+                proxy_pass "http://www.google.com";
+            }
+
+            if ($verify_content ~* ^true[\s\R]*(.*)) {
+                set $error_code $1;
+
+                rewrite .* /set_secure_cookie last;
+            }
+
+            if ($verify_content ~* ^false[\s\R]*(.*)) {
+                set $error_code $1;
+
+                return 403;
+            }
+
+            return 404;
+        }
+
+        location /set_secure_cookie {
+            secure_cookie_expires 1h; 
+            secure_cookie_md5 private_key$binary_remote_addr$secure_cookie_set_expires;
+
+            add_header Set-Cookie "CAPTCHA_SESSION=$secure_cookie_set_md5; expires=$secure_cookie_set_expires; path=/; domain=.yourhost.com";
+            add_header Set-Cookie "CAPTCHA_EXPIRES=$secure_cookie_set_expires; expires=$secure_cookie_set_expires; path=/; domain=.yourhost.com";
+
+            rewrite ^.*$ http://www.your_host.com/index.html last;
+
+            return 302;
+        }
+
+Directives
+  recaptcha_challenge_name
+    syntax: *recaptcha_challenge_name
+    $variable_stored_content_of_recaptcha_challenge_field;*
+
+    default: *none*
+
+    context: *http, server, location*
+
+    description: The name should equal to the name of challenge input form.
+    This directive will add the specific variable. This variable is used
+    only in the directive of proxy_set_body. It will get the value of the
+    challenge input form. It's equal to "$recaptcha_challenge_field"
+    generally.
+
+  recaptcha_response_name
+    syntax: *recaptcha_response_name
+    $variable_stored_content_of_recaptcha_response_field;*
+
+    default: *none*
+
+    context: *http, server, location*
+
+    description: The name should equal to the name of response input form.
+    This directive will add the specific variable. This variable is used
+    only in the directive of proxy_set_body. It will get the value of the
+    response input form. It's equal to "$recaptcha_response_field"
+    generally.
+
+Installation
+    Download the latest version of the release tarball of nginx_eval_module
+    from github (<https://github.com/yaoweibin/nginx-eval-module>).
+
+    Download the latest version of the release tarball of
+    nginx_secure_cookie_module from github
+    (<https://github.com/yaoweibin/nginx_secure_cookie_module>).
+
+    Download the latest version of the release tarball of this module from
+    github (<https://github.com/yaoweibin/nginx_http_recaptcha_module>).
+
+    Grab the nginx source code from nginx.org (<http://nginx.org/>), for
+    example, the version 0.8.54 (see nginx compatibility), and then build
+    the source with this module:
+
+        $ wget 'http://nginx.org/download/nginx-0.8.54.tar.gz'
+        $ tar -xzvf nginx-0.8.54.tar.gz
+        $ cd nginx-0.8.54/
+
+        $ ./configure --add-module=/path/to/nginx_http_recaptcha_module \ 
+            --add-module=/path/to/nginx_secure_cookie_module \
+            --add-module=/path/to/nginx_eval_module
+
+        $ make
+        $ make install
+
+Compatibility
+    *   My test bed is 0.8.54.
+
+TODO
+Known Issues
+    *   Developing
+
+Changelogs
+  v0.1
+    *   first release
+
+Authors
+    Weibin Yao(姚伟斌) *yaoweibin at gmail dot com*
+
+Copyright & License
+    This README template copy from agentzh (<http://github.com/agentzh>).
+
+    This module is licensed under the BSD license.
+
+    Copyright (C) 2010 by Weibin Yao <yaoweibin@gmail.com>.
+
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+    *   Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.
+
+    *   Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+    IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+    PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+    HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+    TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
