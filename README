@@ -93,6 +93,7 @@ Examples
         }
 
         location /set_secure_cookie {
+            internal;
             secure_cookie_expires 1h; 
             secure_cookie_md5 private_key$binary_remote_addr$secure_cookie_set_expires;
 
