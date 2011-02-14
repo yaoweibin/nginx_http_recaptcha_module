@@ -2,7 +2,9 @@ Name
     nginx_http_recaptcha_module - support google's reCAPTCHA with Nginx
 
 Description
-    There are some steps for this module:
+    This module can be deployed in spam or DDOS attack protection for Nginx.
+    It's used the reCAPTCHA to distinguish between human and auto script.
+    The module works with these steps below:
 
     *   First, the request comes from client. If the request contains the
         correct secure cookie, it will do the normal action. If not, the
@@ -25,12 +27,16 @@ HOW TO
     *   Get a pair of recaptcha key from google
         (<https://www.google.com/recaptcha/admin/create>)
 
-    *   Copy the template recaptcha page from recaptcha_html/index.html to
+    *   Copy the template recaptcha page from captcha_html/captcha.html to
         your web directory.
 
     *   Replace the public key in the recaptcha page.
 
     *   Replace the private key in the config file.
+
+    *   Change the secure_cookie_md5's private key in the config file.
+
+    *   Change the domain of yourhost.com to your real domain.
 
 Examples
         location / {
@@ -38,15 +44,15 @@ Examples
             secure_cookie_md5 private_key$binary_remote_addr$cookie_CAPTCHA_EXPIRES;
 
             if ($cookie_CAPTCHA_SESSION = "") {
-                rewrite ^.*$ /captcha last;
+                rewrite ^.*$ /captcha.html redirect;
             }
 
             if ($cookie_CAPTCHA_EXPIRES = "") {
-                rewrite ^.*$ /captcha last;
+                rewrite ^.*$ /captcha.html redirect;
             }
 
             if ($secure_cookie = "0") {
-                rewrite ^.*$ /captcha last;
+                rewrite ^.*$ /captcha.html redirect;
             }
 
             if ($secure_cookie = "") {
@@ -56,12 +62,11 @@ Examples
             proxy_pass http://your_backend;
         }
 
-        location /captcha {
-            alias   captcha_html;
-            index  index.html index.htm;
+        location = /captcha.html {
+            root html;
         }
 
-        location /verify {
+        location = /verify {
             eval_inherit_body on;
             eval_override_content_type 'text/plain';
 
@@ -92,14 +97,15 @@ Examples
             return 404;
         }
 
-        location /set_secure_cookie {
+        location = /set_secure_cookie {
+            internal;
             secure_cookie_expires 1h; 
             secure_cookie_md5 private_key$binary_remote_addr$secure_cookie_set_expires;
 
             add_header Set-Cookie "CAPTCHA_SESSION=$secure_cookie_set_md5; expires=$secure_cookie_set_expires; path=/; domain=.yourhost.com";
             add_header Set-Cookie "CAPTCHA_EXPIRES=$secure_cookie_set_expires; expires=$secure_cookie_set_expires; path=/; domain=.yourhost.com";
 
-            rewrite ^.*$ http://www.your_host.com/index.html last;
+            rewrite ^.*$ http://www.yourhost.com redirect;
 
             return 302;
         }

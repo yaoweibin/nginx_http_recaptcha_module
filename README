@@ -2,7 +2,9 @@ Name
     nginx_http_recaptcha_module - support google's reCAPTCHA with Nginx
 
 Description
-    There are some steps for this module:
+    This module can be deployed in spam or DDOS attack protection for Nginx.
+    It's used the reCAPTCHA to distinguish between human and auto script.
+    The module works with these steps below:
 
     *   First, the request comes from client. If the request contains the
         correct secure cookie, it will do the normal action. If not, the
@@ -33,7 +35,7 @@ HOW TO
     *   Replace the private key in the config file.
 
     *   Change the secure_cookie_md5's private key in the config file.
-    
+
     *   Change the domain of yourhost.com to your real domain.
 
 Examples
