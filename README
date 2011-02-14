@@ -32,21 +32,25 @@ HOW TO
 
     *   Replace the private key in the config file.
 
+    *   Change the secure_cookie_md5's private key in the config file.
+    
+    *   Change the domain of yourhost.com to your real domain.
+
 Examples
         location / {
             secure_cookie $cookie_CAPTCHA_SESSION,$cookie_CAPTCHA_EXPIRES;
             secure_cookie_md5 private_key$binary_remote_addr$cookie_CAPTCHA_EXPIRES;
 
             if ($cookie_CAPTCHA_SESSION = "") {
-                rewrite ^.*$ /captcha.html last;
+                rewrite ^.*$ /captcha.html redirect;
             }
 
             if ($cookie_CAPTCHA_EXPIRES = "") {
-                rewrite ^.*$ /captcha.html last;
+                rewrite ^.*$ /captcha.html redirect;
             }
 
             if ($secure_cookie = "0") {
-                rewrite ^.*$ /captcha.html last;
+                rewrite ^.*$ /captcha.html redirect;
             }
 
             if ($secure_cookie = "") {
@@ -99,7 +103,7 @@ Examples
             add_header Set-Cookie "CAPTCHA_SESSION=$secure_cookie_set_md5; expires=$secure_cookie_set_expires; path=/; domain=.yourhost.com";
             add_header Set-Cookie "CAPTCHA_EXPIRES=$secure_cookie_set_expires; expires=$secure_cookie_set_expires; path=/; domain=.yourhost.com";
 
-            rewrite ^.*$ http://www.yourhost.com/index.html last;
+            rewrite ^.*$ http://www.yourhost.com redirect;
 
             return 302;
         }
