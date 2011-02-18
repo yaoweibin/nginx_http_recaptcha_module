@@ -172,6 +172,9 @@ TODO
 Known Issues
     *   Developing
 
+    *   Google limits 1 million reCAPTCHA requests per day for each key. see
+        faq (<http://www.google.com/recaptcha/faq>).
+
 Changelogs
   v0.1
     *   first release

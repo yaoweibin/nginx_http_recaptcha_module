@@ -160,6 +160,7 @@ Grab the nginx source code from [http://nginx.org/ nginx.org], for example, the 
 = Known Issues =
 
 * Developing  
+* Google limits 1 million reCAPTCHA requests per day for each key. see [http://www.google.com/recaptcha/faq faq]. 
 
 
 = Changelogs =
