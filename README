@@ -100,10 +100,10 @@ Examples
         location = /set_secure_cookie {
             internal;
             secure_cookie_expires 1h; 
-            secure_cookie_md5 private_key$binary_remote_addr$secure_cookie_set_expires;
+            secure_cookie_md5 private_key$binary_remote_addr$secure_cookie_set_expires_base64;
 
             add_header Set-Cookie "CAPTCHA_SESSION=$secure_cookie_set_md5; expires=$secure_cookie_set_expires; path=/; domain=.yourhost.com";
-            add_header Set-Cookie "CAPTCHA_EXPIRES=$secure_cookie_set_expires; expires=$secure_cookie_set_expires; path=/; domain=.yourhost.com";
+            add_header Set-Cookie "CAPTCHA_EXPIRES=$secure_cookie_set_expires_base64; expires=$secure_cookie_set_expires; path=/; domain=.yourhost.com";
 
             rewrite ^.*$ http://www.yourhost.com redirect;
 
