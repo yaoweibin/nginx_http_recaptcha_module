@@ -175,6 +175,9 @@ Known Issues
     *   Google limits 1 million reCAPTCHA requests per day for each key. see
         faq (<http://www.google.com/recaptcha/faq>).
 
+    *   If you use the global key for many sites, you should not add the
+        domain field in the Set-Cookie header.
+
 Changelogs
   v0.1
     *   first release
