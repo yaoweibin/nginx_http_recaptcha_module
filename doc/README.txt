@@ -79,7 +79,7 @@ Examples
                 proxy_set_body "privatekey=your_privatekey_from_google&remoteip=$remote_addr&challenge=$recaptcha_challenge_field&response=$recaptcha_response_field";
 
                 rewrite .* /recaptcha/api/verify break;
-                proxy_pass "http://www.google.com";
+                proxy_pass 'http://www.google.com';
             }
 
             if ($verify_content ~* ^true[\s\R]*(.*)) {
